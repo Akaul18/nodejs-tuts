@@ -1,24 +1,22 @@
 var http = require("http");
 var fs = require("fs");
 
-http.createServer(function(req, res) {
+http
+  .createServer(function(req, res) {
+    if (req.method === "GET") {
+      res.writeHead(200, { "Content-Type": "text/html" });
+      fs.createReadStream("./public/form.html", "UTF-8").pipe(res);
+    } else if (req.method === "POST") {
+      var body = "";
 
-	if (req.method === "GET") {
-		res.writeHead(200, {"Content-Type": "text/html"});
-	    fs.createReadStream("./public/form.html", "UTF-8").pipe(res);
-	} else if (req.method === "POST") {
+      req.on("data", function(chunk) {
+        body += chunk;
+      });
 
-		var body = "";
+      req.on("end", function() {
+        res.writeHead(200, { "Content-Type": "text/html" });
 
-		req.on("data", function(chunk) {
-			body += chunk;
-		});
-
-		req.on("end", function() {
-
-			res.writeHead(200, {"Content-Type": "text/html"});
-
-			res.end(`
+        res.end(`
 
 				<!DOCTYPE html>
 				<html>
@@ -32,15 +30,9 @@ http.createServer(function(req, res) {
 				</html>
 
 			`);
-
-
-		});
-
-
-	}
-
-	
-
-}).listen(3000);
+      });
+    }
+  })
+  .listen(3000);
 
 console.log("Form server listening on port 3000");
